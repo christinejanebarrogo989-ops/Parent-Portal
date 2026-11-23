@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web-Based Parent Portal</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+:root{--navy:#193e6b;--blue:#5b91cc;--bg:#f2f5fb;--gray:#64748b}
+body{background:var(--bg);color:var(--navy)}
+header{background:var(--navy);color:white;padding:22px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.logo{font-size:25px;font-weight:bold}
+nav a{color:white;text-decoration:none;margin-left:15px;cursor:pointer}
+.page,.details-page{display:none}
+.active{display:block}
+.hero{background:var(--navy);color:white;padding:55px 5%}
+.hero h1{font-size:36px;margin-bottom:18px}
+.hero p{line-height:1.7;color:#dceafa}
+button{cursor:pointer;border:0;border-radius:8px;padding:13px 20px;background:var(--blue);color:white;margin-top:15px}
+.hero button{display:block;width:100%;text-align:left;font-size:16px}
+.container,.details-page{padding:35px 5%}
+.section-title{margin-bottom:25px}
+.section-title p,.card p,.panel p{color:var(--gray);line-height:1.6;margin-top:8px}
+.dashboard,.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.card,.panel,.login-box,.about,.contact,.teacher-form{background:white;padding:25px;border-radius:15px;box-shadow:0 3px 12px #0000000d}
+.card{min-height:180px}
+.icon{font-size:35px}
+.card h3{margin:15px 0;color:#777}
+.login-container{max-width:450px;margin:20px auto}
+.login-box h2,.login-box>p{text-align:center;margin-bottom:15px}
+.login-box>p{color:var(--gray)}
+label{display:block;font-weight:bold;margin:14px 0 7px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ccd7e5;border-radius:8px}
+.login-box button,.teacher-form button{width:100%;background:var(--navy)}
+.error{color:#d33;font-size:13px;margin-top:10px}
+.switch{text-align:center;margin-top:20px;color:var(--gray)}
+.switch span{color:var(--blue);cursor:pointer;font-weight:bold}
+.back{background:var(--navy);margin-bottom:25px}
+.info-item,.record,.feedback{background:var(--bg);padding:17px;border-radius:10px;margin-bottom:12px}
+.info-item small{display:block;color:var(--gray);margin-bottom:8px}
+.feedback{border-left:4px solid var(--blue)}
+.panel,.teacher-form{margin-bottom:20px}
+.progress-bg{height:12px;background:#e3eaf3;border-radius:20px;margin-top:12px}
+.progress-fill{height:100%;background:var(--blue);border-radius:20px}
+.about,.contact{margin-top:20px;line-height:1.8}
+footer{background:var(--navy);color:white;text-align:center;padding:20px;margin-top:30px}
+@media(max-width:650px){
+header{flex-direction:column}
+nav a{font-size:12px;margin:6px}
+.hero h1{font-size:29px}
+.dashboard,.info-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">🎓 Parent Portal</div>
+<nav>
+<a onclick="show('home')">Home</a>
+<a onclick="about()">About</a>
+<a onclick="choose('parent')">Parent</a>
+<a onclick="choose('teacher')">Teacher</a>
+</nav>
+</header>
+
+<section id="home" class="page active">
+<div class="hero">
+<h1>Welcome, Parents and Teachers!</h1>
+<p>Stay updated with student behavior, participation, and progress through our Web-Based Parent Portal.</p>
+<button onclick="choose('parent')">Parent Access →</button>
+<button onclick="choose('teacher')">Teacher Access →</button>
+</div>
+<div class="container">
+<div class="about" id="about">
+<h2>About Our Website</h2>
+<p>The Web-Based Parent Portal helps parents monitor and understand their children's attitude in school. Teachers can provide behavior records, participation updates, and feedback.</p>
+</div>
+<div class="contact">
+<h2>Contact Us</h2>
+<p>For questions and concerns, please contact the school administration.</p>
+</div>
+</div>
+</section>
+
+<!-- LOGIN AND SIGN UP -->
+
+<section id="auth" class="page">
+<div class="container">
+<div class="login-container">
+<div class="login-box">
+<h2 id="authTitle">Parent Account</h2>
+<p id="authDescription">Access your account or create a new one.</p>
+
+<div style="display:flex;gap:10px">
+<button style="flex:1" onclick="setMode('login')">LOGIN</button>
+<button style="flex:1" onclick="setMode('signup')">SIGN UP</button>
+</div>
+
+<form id="authForm" onsubmit="submitAuth(event)">
+<div id="signupFields" style="display:none">
+<label>Full Name</label>
+<input id="fullName" placeholder="Enter full name">
+
+<label>Email Address</label>
+<input id="email" type="email" placeholder="Enter email">
+
+<label>Contact Number</label>
+<input id="contact" type="tel" placeholder="Enter contact number">
+
+<div id="parentFields">
+<label>Student Name</label>
+<input id="studentName" placeholder="Enter student name">
+</div>
+
+<div id="teacherFields" style="display:none">
+<label>Subject / Position</label>
+<input id="position" placeholder="Enter subject or position">
+</div>
+</div>
+
+<label>Username</label>
+<input id="username" placeholder="Enter username" required>
+
+<label>Password</label>
+<input id="password" type="password" placeholder="Enter password" required>
+
+<div id="authError" class="error"></div>
+<button id="submitButton" style="width:100%">LOGIN</button>
+</form>
+
+<p class="switch"><span onclick="show('home')">← Back to Home</span></p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- PARENT DASHBOARD -->
+
+<section id="parentDash" class="page">
+<div class="container">
+<h2>Parent Dashboard</h2>
+<p>Monitor your child's school attitude and development.</p>
+</div>
+<div class="dashboard" id="parentCards"></div>
+<button class="back" onclick="logout()">Logout</button>
+</div>
+</section>
+
+<!-- TEACHER DASHBOARD -->
+
+<section id="teacherDash" class="page">
+<div class="container">
+<h2>Teacher Dashboard</h2>
+<p>Manage student behavior, participation, and feedback.</p>
+<div class="dashboard" id="teacherCards"></div>
+<button class="back" onclick="logout()">Logout</button>
+</div>
+</section>
+
+<!-- STUDENT INFORMATION -->
+
+<section id="student" class="details-page">
+<button class="back" onclick="dashboard()">← Back</button>
+<div class="section-title">
+<h2>👨‍🎓 Student Information</h2>
+<p>Student profile and personal details.</p>
+</div>
+<div class="panel">
+<h3>Personal Information</h3>
+<div class="info-grid" id="studentInfo"></div>
+</div>
+</section>
+
+<!-- ATTITUDE RECORDS -->
+
+<section id="attitude" class="details-page">
+<button class="back" onclick="dashboard()">← Back</button>
+<h2>📋 Student Attitude Records</h2>
+<p>Behavior, participation, and discipline monitoring.</p>
+<div class="panel" style="margin-top:20px">
+<div id="records">
+<div class="record"><b>Classroom Participation</b><p>The student participates in classroom discussions and activities.</p></div>
+<div class="record"><b>Behavior</b><p>The student demonstrates appropriate behavior toward classmates and teachers.</p></div>
+<div class="record"><b>Discipline</b><p>The student follows classroom rules and school regulations.</p></div>
+<div class="record"><b>Responsibility</b><p>The student completes assigned school tasks.</p></div>
+</div>
+</div>
+</section>
+
+<!-- MONITORING REPORT -->
+
+<section id="report" class="details-page">
+<button class="back" onclick="dashboard()">← Back</button>
+<h2>📊 Monitoring Report</h2>
+<p>Teacher feedback and student progress summary.</p>
+
+<div class="panel" style="margin-top:20px">
+<h3>Student Progress</h3>
+<div class="record"><b>Classroom Participation</b><p>Shows participation in classroom activities.</p><div class="progress-bg"><div class="progress-fill" style="width:85%"></div></div></div>
+<div class="record"><b>Behavior</b><p>Demonstrates appropriate classroom behavior.</p><div class="progress-bg"><div class="progress-fill" style="width:90%"></div></div></div>
+<div class="record"><b>Discipline</b><p>Follows school and classroom rules.</p><div class="progress-bg"><div class="progress-fill" style="width:80%"></div></div></div>
+</div>
+
+<div class="panel">
+<h3>Teacher Feedback</h3>
+<div id="feedback">
+<div class="feedback"><b>Teacher Observation</b><p>The student actively participates in classroom discussions and school activities.</p></div>
+<div class="feedback"><b>Teacher Recommendation</b><p>Continue developing responsibility, positive behavior, and active participation.</p></div>
+</div>
+</div>
+</section>
+
+<!-- TEACHER UPDATE -->
+
+<section id="update" class="details-page">
+<button class="back" onclick="dashboard()">← Back</button>
+<h2>✏️ Update Student Records</h2>
+<p>Add behavior observations and teacher feedback.</p>
+
+<div class="teacher-form" style="margin-top:20px">
+<h3>Add Student Record</h3>
+<form onsubmit="addRecord(event)">
+<label>Record Category</label>
+<select id="category" required>
+<option value="">Select Category</option>
+<option>Classroom Participation</option>
+<option>Behavior</option>
+<option>Discipline</option>
+<option>Responsibility</option>
+</select>
+<label>Student Observation</label>
+<textarea id="observation" required placeholder="Enter observation..."></textarea>
+<button>Save Student Record</button>
+</form>
+</div>
+
+<div class="teacher-form">
+<h3>Add Teacher Feedback</h3>
+<form onsubmit="addFeedback(event)">
+<label>Feedback Title</label>
+<input id="ftitle" required placeholder="Enter title">
+<label>Teacher Comments</label>
+<textarea id="fmessage" required placeholder="Enter feedback..."></textarea>
+<button>Save Teacher Feedback</button>
+</form>
+</div>
+</section>
+
+<footer>
+© 2026 Web-Based Parent Portal | Student Attitude Monitoring System
+</footer>
+
+<script>
+let role='',mode='login',currentUser=null;
+
+let accounts=JSON.parse(localStorage.getItem('portalAccounts')||'[]');
+let records=JSON.parse(localStorage.getItem('portalRecords')||'[]');
+let feedbacks=JSON.parse(localStorage.getItem('portalFeedback')||'[]');
+
+function show(id){
+document.querySelectorAll('.page,.details-page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+window.scrollTo(0,0);
+}
+
+function choose(type){
+role=type;
+setMode('login');
+document.getElementById('authTitle').textContent=type==='parent'?'Parent Account':'Teacher Account';
+document.getElementById('authDescription').textContent='Login or create your account.';
+show('auth');
+}
+
+function setMode(value){
+mode=value;
+document.getElementById('signupFields').style.display=value==='signup'?'block':'none';
+document.getElementById('parentFields').style.display=role==='parent'?'block':'none';
+document.getElementById('teacherFields').style.display=role==='teacher'?'block':'none';
+document.getElementById('submitButton').textContent=value==='signup'?'CREATE ACCOUNT':'LOGIN';
+document.getElementById('authError').textContent='';
+}
+
+function submitAuth(e){
+e.preventDefault();
+
+let username=document.getElementById('username').value.trim();
+let password=document.getElementById('password').value;
+let error=document.getElementById('authError');
+
+if(mode==='signup'){
+let a={
+role,username,password,
+name:document.getElementById('fullName').value.trim(),
+email:document.getElementById('email').value.trim(),
+contact:document.getElementById('contact').value.trim(),
+studentName:role==='parent'?document.getElementById('studentName').value.trim():'',
+studentNumber:role==='parent'?document.getElementById('studentNumber').value.trim():'',
+position:role==='teacher'?document.getElementById('position').value.trim():''
+};
+
+if(accounts.some(x=>x.role===role&&x.username.toLowerCase()===username.toLowerCase())){
+error.textContent='Username already exists.';
+return;
+}
+
+if(!a.name||!a.email||!a.contact||(role==='parent'&&(!a.studentName||!a.studentNumber))||(role==='teacher'&&!a.position)){
+error.textContent='Please complete all information.';
+return;
+}
+
+accounts.push(a);
+localStorage.setItem('portalAccounts',JSON.stringify(accounts));
+alert('Account created successfully! Please log in.');
+setMode('login');
+document.getElementById('username').value=username;
+document.getElementById('password').value='';
+}else{
+let a=accounts.find(x=>x.role===role&&x.username===username&&x.password===password);
+if(!a){error.textContent='Invalid username or password.';return;}
+currentUser=a;
+show(role==='parent'?'parentDash':'teacherDash');
+}
+}
+
+const parentItems=[
+["👨‍🎓","Student Information","View student profile.","student"],
+["📋","Student Attitude Records","View behavior and participation.","attitude"],
+["📊","Monitoring Report","Review feedback and progress.","report"]
+];
+
+const teacherItems=[
+...parentItems,
+["✏️","Update Student Records","Add behavior records and feedback.","update"]
+];
+
+function makeCards(items){
+return items.map(i=>`<div class="card"><div class="icon">${i[0]}</div><h3>${i[1]}</h3><p>${i[2]}</p><button onclick="openSection('${i[3]}')">View Details →</button></div>`).join('');
+}
+
+document.getElementById('parentCards').innerHTML=makeCards(parentItems);
+document.getElementById('teacherCards').innerHTML=makeCards(teacherItems);
+
+function openSection(id){
+if(id==='student')loadStudent();
+if(id==='attitude'||id==='report')renderData();
+show(id);
+}
+
+function loadStudent(){
+let a=currentUser;
+let info=[
+['Account Name',a.name],['Email Address',a.email],
+['Contact Number',a.contact],
+['Student Name',a.role==='parent'?a.studentName:'Not provided'],
+['Student Number',a.role==='parent'?a.studentNumber:'Not provided'],
+['Grade Level','Grade 11'],['Section','GAS'],
+['School Year','2026-2027'],
+['Subject / Position',a.role==='teacher'?a.position:'Not provided']
+];
+
+let box=document.getElementById('studentInfo');
+box.innerHTML='';
+info.forEach(i=>{
+let div=document.createElement('div');
+div.className='info-item';
+let small=document.createElement('small');
+small.textContent=i[0];
+let strong=document.createElement('b');
+strong.textContent=i[1];
+div.append(small,strong);
+box.appendChild(div);
+});
+}
+
+function renderData(){
+let rbox=document.getElementById('records');
+let fbox=document.getElementById('feedback');
+rbox.innerHTML='';
+fbox.innerHTML='';
+
+records.forEach(r=>{
+let div=document.createElement('div');
+div.className='record';
+let b=document.createElement('b');
+b.textContent=r.category;
+let p=document.createElement('p');
+p.textContent=r.observation;
+div.append(b,p);
+rbox.appendChild(div);
+});
+
+feedbacks.forEach(f=>{
+let div=document.createElement('div');
+div.className='feedback';
+let b=document.createElement('b');
+b.textContent=f.title;
+let p=document.createElement('p');
+p.textContent=f.message;
+div.append(b,p);
+fbox.appendChild(div);
+});
+}
+
+function dashboard(){
+if(currentUser)show(currentUser.role==='teacher'?'teacherDash':'parentDash');
+}
+
+function addRecord(e){
+e.preventDefault();
+if(currentUser?.role!=='teacher')return;
+records.push({
+category:document.getElementById('category').value,
+observation:document.getElementById('observation').value
+});
+localStorage.setItem('portalRecords',JSON.stringify(records));
+renderData();
+e.target.reset();
+alert('Student record saved!');
+}
+
+function addFeedback(e){
+e.preventDefault();
+if(currentUser?.role!=='teacher')return;
+feedbacks.push({
+title:document.getElementById('ftitle').value,
+message:document.getElementById('fmessage').value
+});
+localStorage.setItem('portalFeedback',JSON.stringify(feedbacks));
+renderData();
+e.target.reset();
+alert('Teacher feedback saved!');
+}
+
+function about(){
+show('home');
+setTimeout(()=>document.getElementById('about').scrollIntoView({behavior:'smooth'}),100);
+}
+
+function logout(){
+currentUser=null;
+role='';
+show('home');
+}
+
+show('home');
+</script>
+</body>
+</html>
